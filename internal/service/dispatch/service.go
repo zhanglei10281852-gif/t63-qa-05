@@ -204,15 +204,11 @@ func (s Service) ReturnTrip(ctx context.Context, input ReturnTripInput) (trip.Tr
 			return err
 		}
 		previousVehicle := vehicleItem
-		returnedVehicle, err := vehicleItem.FinishReturn(input.EndOdometer, now)
+		updated, err := vehicleItem.FinishReturn(input.EndOdometer, now)
 		if err != nil {
 			return err
 		}
-		vehicleSnapshot := returnedVehicle
-		if returnedVehicle.Version > previousVehicle.Version {
-			vehicleSnapshot = previousVehicle
-		}
-		if err := tx.SaveVehicle(ctx, vehicleSnapshot, previousVehicle.Version); err != nil {
+		if err := tx.SaveVehicle(ctx, updated, previousVehicle.Version); err != nil {
 			return err
 		}
 		previousShift := shift
